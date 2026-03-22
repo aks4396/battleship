@@ -1,0 +1,73 @@
+.board-container {
+  display: inline-block;
+  margin: 0 16px;
+}
+
+.board-label {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.board-table {
+  border-collapse: collapse;
+  user-select: none;
+}
+
+.corner-cell {
+  width: 28px;
+  height: 28px;
+}
+
+.header-cell {
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.cell {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #bbb;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.85rem;
+  transition: background-color 0.15s;
+}
+
+.cell-empty {
+  background-color: #e8f4fd;
+}
+
+.cell-ship {
+  background-color: #607d8b;
+}
+
+.cell-hit {
+  background-color: #ff7043;
+  color: #fff;
+}
+
+.cell-miss {
+  background-color: #cfd8dc;
+  color: #78909c;
+}
+
+.cell-sunk {
+  background-color: #d32f2f;
+  color: #fff;
+  font-weight: bold;
+}
+
+.cell-clickable {
+  cursor: pointer;
+}
+
+.cell-clickable:hover {
+  background-color: #b3e5fc;
+  border-color: #0288d1;
+}
