@@ -72,6 +72,7 @@ describe('updateAIState', () => {
       coord: { row: 0, col: 1 },
       outcome: 'sunk',
       shipName: 'Destroyer',
+      shipCoords: [{ row: 0, col: 0 }, { row: 0, col: 1 }],
     });
     expect(state.mode).toBe('hunt');
     expect(state.activeHits.length).toBe(0);
@@ -86,9 +87,30 @@ describe('updateAIState', () => {
       coord: { row: 0, col: 1 },
       outcome: 'sunk',
       shipName: 'Destroyer',
+      shipCoords: [{ row: 0, col: 0 }, { row: 0, col: 1 }],
     });
     expect(state.mode).toBe('target');
     expect(state.activeHits.length).toBe(1);
+  });
+
+  it('does not remove adjacent ship hits when sinking a neighboring ship', () => {
+    const state = createAIState();
+    // Ship A (Destroyer): (5,5), (5,6)
+    // Ship B (Cruiser): (5,7), (5,8), (5,9) — adjacent to Ship A
+    updateAIState(state, { coord: { row: 5, col: 5 }, outcome: 'hit' });
+    updateAIState(state, { coord: { row: 5, col: 7 }, outcome: 'hit' });
+    expect(state.activeHits.length).toBe(2);
+    // Sink Ship A
+    updateAIState(state, {
+      coord: { row: 5, col: 6 },
+      outcome: 'sunk',
+      shipName: 'Destroyer',
+      shipCoords: [{ row: 5, col: 5 }, { row: 5, col: 6 }],
+    });
+    // Ship B's hit at (5,7) should still be in activeHits
+    expect(state.mode).toBe('target');
+    expect(state.activeHits.length).toBe(1);
+    expect(state.activeHits[0]).toBe(coordKey({ row: 5, col: 7 }));
   });
 
   it('records attacked cells for misses', () => {

@@ -43,6 +43,7 @@ export interface AttackResult {
   coord: Coord;
   outcome: 'hit' | 'miss' | 'sunk';
   shipName?: string; // set when outcome is 'sunk'
+  shipCoords?: Coord[]; // set when outcome is 'sunk' — all coords of the sunk ship
 }
 
 /** Standard Battleship fleet. */

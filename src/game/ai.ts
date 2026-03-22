@@ -99,25 +99,15 @@ export function updateAIState(state: AIState, result: AttackResult): void {
       }
     }
   } else if (result.outcome === 'sunk') {
-    // When a ship is sunk, remove the sunk coord from activeHits.
-    // Also remove any activeHits that are adjacent to it (they likely
-    // belong to the same ship). We use a flood-fill approach: starting
-    // from the sunk coord, remove any connected activeHits neighbors.
-    const toRemove = new Set<string>([key]);
-    const queue = [key];
-    while (queue.length > 0) {
-      const current = queue.pop()!;
-      const currentCoord = parseCoordKey(current);
-      const neighbors = getNeighbors(currentCoord);
-      for (const n of neighbors) {
-        const nk = coordKey(n);
-        if (!toRemove.has(nk) && state.activeHits.includes(nk)) {
-          toRemove.add(nk);
-          queue.push(nk);
-        }
-      }
-    }
-    state.activeHits = state.activeHits.filter((h) => !toRemove.has(h));
+    // Use the sunk ship's exact coordinates to remove only its hits
+    // from activeHits. This avoids the flood-fill bug where adjacent
+    // ships' hits would be incorrectly removed.
+    const sunkKeys = new Set<string>(
+      (result.shipCoords ?? []).map((c) => coordKey(c)),
+    );
+    // Also include the sunk coord itself in case shipCoords is missing
+    sunkKeys.add(key);
+    state.activeHits = state.activeHits.filter((h) => !sunkKeys.has(h));
 
     // If there are still active hits, stay in target mode
     if (state.activeHits.length > 0) {

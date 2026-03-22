@@ -54,7 +54,7 @@ export function processAttack(
     for (const c of ship.coords) {
       board.grid[c.row][c.col] = 'sunk';
     }
-    return { coord, outcome: 'sunk', shipName: ship.name };
+    return { coord, outcome: 'sunk', shipName: ship.name, shipCoords: ship.coords };
   }
 
   return { coord, outcome: 'hit' };
