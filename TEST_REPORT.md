@@ -5,10 +5,10 @@
 This document details the comprehensive testing methodology for the Battleship game. Testing is performed across four layers: **unit tests** (pure logic), **integration tests** (React component state/UI), **E2E tests** (browser-level user flows via Playwright), and **manual QA** (visual, animation, responsiveness).
 
 **Test Counts:**
-- Unit tests: 87 (Vitest)
-- Integration tests: 25 (Vitest + @testing-library/react + jsdom)
-- E2E tests: 12 (Playwright + Chromium)
-- **Total automated: 124**
+- Unit tests: 115 (Vitest) — includes 28 placement-specific tests
+- Integration tests: 37 (Vitest + @testing-library/react + jsdom) — includes 12 placement flow tests
+- E2E tests: 14 (Playwright + Chromium) — includes 2 placement-specific tests
+- **Total automated: 166**
 
 ---
 
@@ -35,6 +35,7 @@ This document details the comprehensive testing methodology for the Battleship g
 - Ship segment rendering metadata (bow/mid/stern, horizontal/vertical)
 - Clean state generation (`createEmptyBoard`, `createAIState`)
 - Coord key round-tripping (`coordKey` / `parseCoordKey`)
+- **Manual placement workflow:** sequential ship placement, overlap rejection during placement, orientation toggling, setup completeness validation, placement preview validation, reset placement clean state
 
 ### Layer 2: Integration Tests (React Component State/UI)
 
@@ -56,6 +57,7 @@ This document details the comprehensive testing methodology for the Battleship g
 - Restart resets all fleet status to alive
 - Setup phase guards (clicking enemy board during setup has no effect)
 - Decorative layer safety (underwater ambience has `pointer-events: none`)
+- **Manual placement:** board starts empty, clicking places ship, Randomize populates all ships, Reset clears board, Rotate toggles orientation display, placement controls disappear after starting, status text shows next ship, "All ships placed" message, restart returns to empty board, manual placement then start game works
 
 ### Layer 3: E2E Tests (Browser-Level User Flows)
 
@@ -75,7 +77,9 @@ This document details the comprehensive testing methodology for the Battleship g
 - Page refresh still loads app (no stale state)
 - Decorative layers do not block board interaction (`pointer-events: none` verified)
 - Enemy board not clickable during setup
-- Randomize button changes ship positions (17 ship cells maintained)
+- Randomize button populates all ships (empty→17 ship cells)
+- Placement controls visible during setup (Rotate, Reset buttons)
+- Start Game disabled until ships placed, enabled after Randomize
 
 ### Layer 4: Manual QA (Visual, Animation, Responsiveness)
 
@@ -122,7 +126,7 @@ The following edge cases were explicitly audited. Each is covered by automated t
 | Clicks during setup on enemy board | Integration: clicking enemy board during setup has no effect; E2E: no clickable cells during setup | No |
 | Incorrect sunk detection for adjacent ships | Unit: `sinking one ship does not affect adjacent ship cells`, `can sink adjacent ships independently`; AI: `does not remove adjacent ship hits when sinking a neighboring ship` | No |
 | Selected difficulty not applying correctly | N/A -- difficulty modes not implemented in current version | N/A |
-| Incomplete setup still allowing game start | N/A -- setup uses random placement only, always complete | N/A |
+| Incomplete setup still allowing game start | Integration: Start Game disabled when no ships placed; enabled only after all 5 placed | No |
 | Ship placement off-board | Unit: `shipCoords` returns null for out-of-bounds; boundary tests for max valid positions | No |
 | Ship placement overlap | Unit: `canPlaceShip` rejects overlap, perpendicular crossing, complete overlap | No |
 | Vertical/horizontal ship rendering mismatch | Unit: `getShipSegmentInfo` tests for both orientations; visual verification in manual QA | Yes -- visual check |
@@ -141,11 +145,16 @@ These checks should be performed manually on the deployed app:
 
 ### Setup Phase
 - [ ] App loads with "Battleship" title, two boards, three buttons, two fleet panels
-- [ ] Player board shows ships with correct bow/mid/stern segments
-- [ ] Horizontal ships have left-pointing bow, right-pointing stern
-- [ ] Vertical ships have top-pointing bow, bottom-pointing stern
-- [ ] Enemy board shows no ships
-- [ ] "Randomize My Board" changes ship positions, maintains 17 ship cells
+- [ ] Player board starts empty (no ships visible)
+- [ ] PlacementControls panel shows fleet list with Carrier auto-selected
+- [ ] Click a cell on player board to place Carrier (5 cells appear)
+- [ ] Next ship auto-selects (Battleship)
+- [ ] Rotate button toggles H/V orientation
+- [ ] Hover preview shows green (valid) or red (invalid/overlapping/OOB)
+- [ ] Reset Placement clears all placed ships
+- [ ] Randomize My Board populates all 17 ship cells
+- [ ] Start Game disabled until all 5 ships placed, enabled after
+- [ ] PlacementControls disappear after starting game
 - [ ] Clicking enemy board during setup does nothing
 
 ### Gameplay
@@ -229,19 +238,29 @@ These checks should be performed manually on the deployed app:
 |---|---|---|
 | `getShipSegmentInfo` | 6 | Horizontal bow/mid/stern, vertical bow/mid/stern, non-ship returns null, single-cell ship, sunk ship segments, hit ship segments |
 
-### `src/__tests__/integration.test.tsx` (25 tests)
+### `src/__tests__/placement.test.ts` (28 tests)
 
 | Describe Block | Tests | What It Covers |
 |---|---|---|
-| `initial render` | 5 | Title, buttons, status text, boards, fleet panels |
-| `setup flow` | 4 | Randomize works, start hides buttons, playing status text, clickable cells |
-| `gameplay` | 5 | Status updates, cell state changes, AI turns, repeated click prevention |
+| `sequential manual placement` | 4 | Place all 5 ships one at a time, duplicate name prevention (app-level), overlap rejection during sequential placement, mixed orientations |
+| `orientation handling` | 4 | Horizontal occupies same row, vertical occupies same col, valid in one orientation but not other, toggling changes occupied cells |
+| `setup completeness` | 4 | Empty board has 0 ships, partial count, full placement matches FLEET.length, placed names match FLEET |
+| `placement preview validation` | 4 | Valid preview on empty board, OOB returns null, overlap returns false, adjacent allowed |
+| `reset placement` | 2 | createEmptyBoard produces clean state, new board independent of previous |
+
+### `src/__tests__/integration.test.tsx` (37 tests)
+
+| Describe Block | Tests | What It Covers |
+|---|---|---|
+| `setup phase` | 10 | Title, placement controls, Start Game disabled, buttons, status text, boards, fleet panels, ship names, cell counts, enemy board styling |
+| `randomize and start` | 4 | Randomize works, start hides buttons, playing status text, clickable cells |
+| `gameplay` | 4 | Status updates, cell state changes, AI turns, repeated click prevention |
 | `restart` | 4 | From setup, from gameplay, clears markers, resets fleet |
 | `setup guards` | 2 | Enemy board clicks blocked during setup |
-| `decorative layer safety` | 1 | Underwater ambience has pointer-events: none |
-| `game-over` | 4 | Disables enemy clicks, disables randomize, disables start, shows restart |
+| `manual ship placement` | 10 | Board starts empty, click places ship, Randomize populates + enables Start, Reset clears, Rotate toggles, placement controls disappear, status shows next ship, all-placed message, restart returns to empty board, manual placement then gameplay |
+| `decorative layer safety` | 2 | Underwater ambience rendered, has aria-hidden |
 
-### `e2e/battleship.spec.ts` (12 tests)
+### `e2e/battleship.spec.ts` (14 tests)
 
 | Test | What It Covers |
 |---|---|
@@ -249,14 +268,16 @@ These checks should be performed manually on the deployed app:
 | Shows two boards on load | Board headings visible |
 | Shows setup buttons on load | All 3 buttons present |
 | Shows fleet panels on load | Fleet status panels visible |
-| User can start and play a game | Full start -> attack -> status update flow |
+| User can start and play a game | Randomize + start -> attack -> status update flow |
 | Repeated click on same target is blocked | No extra AI turn on duplicate click |
 | AI takes exactly one turn after valid player move | 1:1 turn alternation |
 | Restart mid-game works | Returns to setup, clears markers |
 | Refresh still loads app | Page reload doesn't break state |
 | Decorative layers do not block board interaction | pointer-events verified + click-through |
 | Enemy board not clickable during setup | No clickable cells in setup phase |
-| Randomize button changes ship positions | 17 ship cells maintained |
+| Randomize button populates all ships | Board goes from 0 to 17 ship cells |
+| Placement controls visible during setup | Rotate and Reset buttons present |
+| Start Game disabled until ships placed | Disabled initially, enabled after Randomize |
 
 ---
 
