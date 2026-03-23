@@ -7,8 +7,18 @@
 body {
   margin: 0;
   padding: 0;
-  background: #fafafa;
-  color: #222;
+  background: linear-gradient(
+    180deg,
+    #0a2a4a 0%,
+    #0d3a5c 15%,
+    #0f4a6e 35%,
+    #0b3050 60%,
+    #082040 85%,
+    #051530 100%
+  );
+  background-attachment: fixed;
+  color: #c8dce8;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

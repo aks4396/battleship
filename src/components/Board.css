@@ -1,3 +1,6 @@
+/* ───────────────────────────────────────────
+   Board layout
+   ─────────────────────────────────────────── */
 .board-container {
   display: inline-block;
   margin: 0 16px;
@@ -7,12 +10,17 @@
   text-align: center;
   margin-bottom: 8px;
   font-size: 1.1rem;
-  color: #333;
+  color: #b8d4e8;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.5px;
 }
 
 .board-table {
   border-collapse: collapse;
   user-select: none;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 30, 60, 0.4);
 }
 
 .corner-cell {
@@ -26,48 +34,310 @@
   text-align: center;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #555;
+  color: #8ab4d0;
 }
 
+/* ───────────────────────────────────────────
+   Cell base
+   ─────────────────────────────────────────── */
 .cell {
   width: 28px;
   height: 28px;
-  border: 1px solid #bbb;
+  border: 1px solid rgba(100, 180, 220, 0.25);
   text-align: center;
   vertical-align: middle;
   font-size: 0.85rem;
-  transition: background-color 0.15s;
+  position: relative;
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
+/* ───────────────────────────────────────────
+   Cell states — underwater theme
+   ─────────────────────────────────────────── */
 .cell-empty {
-  background-color: #e8f4fd;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 80, 130, 0.35) 0%,
+    rgba(30, 100, 160, 0.25) 100%
+  );
 }
 
 .cell-ship {
-  background-color: #607d8b;
+  background: linear-gradient(135deg, #4a6a7a 0%, #3d5a6a 100%);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
 .cell-hit {
-  background-color: #ff7043;
-  color: #fff;
+  background: radial-gradient(circle at center, #ff6b35 30%, #e04520 100%);
+  animation: hit-pulse 0.4s ease-out;
 }
 
 .cell-miss {
-  background-color: #cfd8dc;
-  color: #78909c;
+  background: radial-gradient(
+    circle at center,
+    rgba(120, 180, 220, 0.5) 0%,
+    rgba(40, 90, 140, 0.3) 100%
+  );
 }
 
 .cell-sunk {
-  background-color: #d32f2f;
-  color: #fff;
-  font-weight: bold;
+  background: linear-gradient(135deg, #5a3030 0%, #3a2020 100%);
 }
 
+/* ───────────────────────────────────────────
+   Cell icons (replacing emoji with CSS shapes)
+   ─────────────────────────────────────────── */
+.cell-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Hit: fire/explosion effect */
+.cell-icon-hit::before,
+.cell-icon-hit::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+.cell-icon-hit::before {
+  width: 12px;
+  height: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #ffdd00 20%, #ff6600 70%, transparent 100%);
+  box-shadow: 0 0 6px 2px rgba(255, 100, 0, 0.6);
+  animation: fire-glow 1.5s ease-in-out infinite alternate;
+}
+.cell-icon-hit::after {
+  width: 6px;
+  height: 6px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff8e0;
+  box-shadow: 0 0 4px 1px rgba(255, 255, 200, 0.8);
+}
+
+/* Miss: ripple effect */
+.cell-icon-miss::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(180, 220, 255, 0.6);
+  border-radius: 50%;
+  animation: ripple 2s ease-out infinite;
+}
+
+/* Sunk: X mark with damage feel */
+.cell-icon-sunk::before,
+.cell-icon-sunk::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 2px;
+  top: 50%;
+  left: 50%;
+  background: rgba(255, 100, 80, 0.9);
+  box-shadow: 0 0 3px rgba(255, 80, 60, 0.5);
+}
+.cell-icon-sunk::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.cell-icon-sunk::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* ───────────────────────────────────────────
+   Clickable cells
+   ─────────────────────────────────────────── */
 .cell-clickable {
   cursor: pointer;
 }
 
 .cell-clickable:hover {
-  background-color: #b3e5fc;
-  border-color: #0288d1;
+  background: rgba(100, 200, 255, 0.35);
+  border-color: rgba(100, 200, 255, 0.6);
+  box-shadow: inset 0 0 8px rgba(100, 200, 255, 0.3);
+}
+
+/* ───────────────────────────────────────────
+   Ship segment styling — bow / mid / stern
+   Creates connected ship shapes using border-radius
+   ─────────────────────────────────────────── */
+
+/* Horizontal ships */
+.seg-bow-h.cell-ship,
+.seg-bow-h.cell-hit,
+.seg-bow-h.cell-sunk {
+  border-radius: 10px 0 0 10px;
+  border-left: 2px solid rgba(200, 220, 230, 0.3);
+}
+
+.seg-mid-h.cell-ship,
+.seg-mid-h.cell-hit,
+.seg-mid-h.cell-sunk {
+  border-radius: 0;
+}
+
+.seg-stern-h.cell-ship,
+.seg-stern-h.cell-hit,
+.seg-stern-h.cell-sunk {
+  border-radius: 0 6px 6px 0;
+  border-right: 2px solid rgba(200, 220, 230, 0.3);
+}
+
+/* Vertical ships */
+.seg-bow-v.cell-ship,
+.seg-bow-v.cell-hit,
+.seg-bow-v.cell-sunk {
+  border-radius: 10px 10px 0 0;
+  border-top: 2px solid rgba(200, 220, 230, 0.3);
+}
+
+.seg-mid-v.cell-ship,
+.seg-mid-v.cell-hit,
+.seg-mid-v.cell-sunk {
+  border-radius: 0;
+}
+
+.seg-stern-v.cell-ship,
+.seg-stern-v.cell-hit,
+.seg-stern-v.cell-sunk {
+  border-radius: 0 0 6px 6px;
+  border-bottom: 2px solid rgba(200, 220, 230, 0.3);
+}
+
+/* Solo ship (size 1, unlikely but safe) */
+.seg-solo-h.cell-ship,
+.seg-solo-v.cell-ship,
+.seg-solo-h.cell-hit,
+.seg-solo-v.cell-hit,
+.seg-solo-h.cell-sunk,
+.seg-solo-v.cell-sunk {
+  border-radius: 8px;
+}
+
+/* Ship body gradient for healthy ships */
+.seg-bow-h.cell-ship,
+.seg-mid-h.cell-ship,
+.seg-stern-h.cell-ship {
+  background: linear-gradient(180deg, #5a7a8a 0%, #3d5a6a 40%, #4a6a7a 100%);
+  box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.12),
+              inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.seg-bow-v.cell-ship,
+.seg-mid-v.cell-ship,
+.seg-stern-v.cell-ship {
+  background: linear-gradient(90deg, #5a7a8a 0%, #3d5a6a 40%, #4a6a7a 100%);
+  box-shadow: inset 2px 0 3px rgba(255, 255, 255, 0.12),
+              inset -1px 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ───────────────────────────────────────────
+   Sunk ship wreck treatment
+   ─────────────────────────────────────────── */
+.seg-wreck {
+  background: linear-gradient(135deg, #4a3535 0%, #2d2020 50%, #3a2a2a 100%) !important;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5),
+              0 0 4px rgba(80, 30, 20, 0.4) !important;
+  animation: wreck-settle 0.6s ease-out;
+}
+
+.seg-wreck::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(150, 200, 255, 0.3);
+  bottom: 2px;
+  right: 4px;
+  animation: wreck-bubble 3s ease-in infinite;
+  animation-delay: var(--bubble-delay, 0s);
+}
+
+/* Stagger bubble timing per cell */
+.seg-bow-h.seg-wreck::before,
+.seg-bow-v.seg-wreck::before { --bubble-delay: 0s; }
+.seg-mid-h.seg-wreck::before,
+.seg-mid-v.seg-wreck::before { --bubble-delay: 1s; }
+.seg-stern-h.seg-wreck::before,
+.seg-stern-v.seg-wreck::before { --bubble-delay: 2s; }
+
+/* ───────────────────────────────────────────
+   Animations
+   ─────────────────────────────────────────── */
+@keyframes hit-pulse {
+  0% {
+    transform: scale(1.3);
+    box-shadow: 0 0 12px rgba(255, 100, 0, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+}
+
+@keyframes fire-glow {
+  0% {
+    box-shadow: 0 0 4px 1px rgba(255, 100, 0, 0.4);
+    opacity: 0.8;
+  }
+  100% {
+    box-shadow: 0 0 8px 3px rgba(255, 100, 0, 0.7);
+    opacity: 1;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    width: 4px;
+    height: 4px;
+    opacity: 1;
+    border-width: 2px;
+  }
+  100% {
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+@keyframes wreck-settle {
+  0% {
+    transform: translateY(-2px);
+    opacity: 0.7;
+  }
+  60% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes wreck-bubble {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-20px) scale(0.5);
+    opacity: 0;
+  }
 }
