@@ -9,16 +9,20 @@ body {
   padding: 0;
   background: linear-gradient(
     180deg,
-    #0a2a4a 0%,
-    #0d3a5c 15%,
-    #0f4a6e 35%,
-    #0b3050 60%,
-    #082040 85%,
-    #051530 100%
+    #031a2e 0%,
+    #062d4a 8%,
+    #0a3d62 18%,
+    #0d4a72 30%,
+    #0b3f60 45%,
+    #08324e 60%,
+    #06263c 75%,
+    #041c2e 88%,
+    #021220 100%
   );
   background-attachment: fixed;
   color: #c8dce8;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
