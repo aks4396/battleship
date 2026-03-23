@@ -101,9 +101,11 @@ export function BoardView({
 
                 // Build CSS classes for ship segment styling
                 const shipClasses: string[] = [];
+                // On the AI board, only show ship shapes for sunk cells (not hits,
+                // to avoid leaking ship orientation/position to the player).
                 const showShipShape =
                   segment &&
-                  (state === 'ship' || state === 'hit' || state === 'sunk');
+                  ((!hideShips && state === 'ship') || (!hideShips && state === 'hit') || state === 'sunk');
 
                 if (showShipShape) {
                   shipClasses.push(`seg-${segment.position}-${segment.orientation}`);
