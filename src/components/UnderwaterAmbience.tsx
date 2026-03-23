@@ -190,10 +190,10 @@ export function UnderwaterAmbience() {
         transition={{ duration: 38, repeat: Infinity, ease: 'linear', delay: 0 }}
       >
         <DotLottieReact
-          src="https://lottie.host/c4bd98cd-db74-49c5-aa14-beea9e5fe8da/rFH8MSNmLz.lottie"
+          src="/jellyfish.json"
           loop
           autoplay
-          style={{ width: 80, height: 80 }}
+          style={{ width: 90, height: 130 }}
         />
       </motion.div>
 
@@ -204,10 +204,10 @@ export function UnderwaterAmbience() {
         transition={{ duration: 44, repeat: Infinity, ease: 'linear', delay: 12 }}
       >
         <DotLottieReact
-          src="https://lottie.host/b2cea293-fa59-464d-9ab0-29e9908c71a6/V4hZsuXmAT.lottie"
+          src="/jellyfish.json"
           loop
           autoplay
-          style={{ width: 60, height: 60 }}
+          style={{ width: 65, height: 95 }}
         />
       </motion.div>
 
@@ -218,10 +218,10 @@ export function UnderwaterAmbience() {
         transition={{ duration: 50, repeat: Infinity, ease: 'linear', delay: 30 }}
       >
         <DotLottieReact
-          src="https://lottie.host/c32601c1-5ed7-4211-ad52-4fcc6084261c/offy4sIZvp.lottie"
+          src="/jellyfish.json"
           loop
           autoplay
-          style={{ width: 45, height: 45 }}
+          style={{ width: 50, height: 72 }}
         />
       </motion.div>
 
@@ -299,17 +299,15 @@ export function UnderwaterAmbience() {
           <path d="M0,35 L8,22 Q15,15 22,20 L30,12 Q38,8 45,18 L55,22 Q60,18 70,24 L80,35 Z" fill="rgba(38,52,62,0.22)" />
         </svg>
 
-        {/* Treasure chest */}
-        <svg className="treasure" viewBox="0 0 50 40" width="50" height="40">
-          <rect x="8" y="18" width="34" height="20" rx="2" fill="rgba(120,80,30,0.18)" />
-          <path d="M6,18 Q25,10 44,18" fill="rgba(140,90,35,0.2)" />
-          <rect x="22" y="22" width="6" height="5" rx="1" fill="rgba(220,180,50,0.2)" />
-          <circle cx="25" cy="24" r="1.5" fill="rgba(255,220,80,0.25)" />
-          <circle cx="14" cy="36" r="3" fill="rgba(220,180,50,0.12)" />
-          <circle cx="38" cy="35" r="2.5" fill="rgba(220,180,50,0.1)" />
-          <circle cx="10" cy="34" r="2" fill="rgba(220,180,50,0.08)" />
-          <circle cx="42" cy="33" r="1.5" fill="rgba(220,180,50,0.06)" />
-        </svg>
+        {/* Lottie Treasure chest */}
+        <div className="treasure lottie-creature">
+          <DotLottieReact
+            src="/treasure.json"
+            loop
+            autoplay
+            style={{ width: 70, height: 60 }}
+          />
+        </div>
 
         {/* Shipwreck silhouette */}
         <svg className="shipwreck-bg" viewBox="0 0 200 100" width="200" height="100">
