@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import './UnderwaterAmbience.css';
 
 /**
@@ -180,48 +181,48 @@ export function UnderwaterAmbience() {
         </svg>
       </motion.div>
 
-      {/* Jellyfish 1 — drift upward */}
+      {/* ─── DotLottie hero jellyfish ─── */}
+
+      {/* Lottie Jellyfish 1 — hero creature, drifts upward */}
       <motion.div
-        className="creature creature-jelly-1"
+        className="creature lottie-creature lottie-jelly-1"
         animate={{ y: [0, '-35vh'], x: [0, 20, -15, 10, -5] }}
         transition={{ duration: 38, repeat: Infinity, ease: 'linear', delay: 0 }}
       >
-        <svg viewBox="0 0 30 50" width="30" height="50">
-          <ellipse cx="15" cy="12" rx="12" ry="10" fill="currentColor" opacity="0.15" />
-          <ellipse cx="15" cy="12" rx="8" ry="7" fill="currentColor" opacity="0.08" />
-          <path d="M6,18 Q8,30 5,42" stroke="currentColor" strokeWidth="0.8" fill="none" opacity="0.12" />
-          <path d="M11,20 Q12,32 9,45" stroke="currentColor" strokeWidth="0.8" fill="none" opacity="0.1" />
-          <path d="M19,20 Q18,32 21,45" stroke="currentColor" strokeWidth="0.8" fill="none" opacity="0.1" />
-          <path d="M24,18 Q22,30 25,42" stroke="currentColor" strokeWidth="0.8" fill="none" opacity="0.12" />
-        </svg>
+        <DotLottieReact
+          src="https://lottie.host/c4bd98cd-db74-49c5-aa14-beea9e5fe8da/rFH8MSNmLz.lottie"
+          loop
+          autoplay
+          style={{ width: 80, height: 80 }}
+        />
       </motion.div>
 
-      {/* Jellyfish 2 */}
+      {/* Lottie Jellyfish 2 — second hero creature */}
       <motion.div
-        className="creature creature-jelly-2"
+        className="creature lottie-creature lottie-jelly-2"
         animate={{ y: [0, '-30vh'], x: [0, -12, 18, -8, 5] }}
         transition={{ duration: 44, repeat: Infinity, ease: 'linear', delay: 12 }}
       >
-        <svg viewBox="0 0 24 40" width="24" height="40">
-          <ellipse cx="12" cy="10" rx="10" ry="8" fill="currentColor" opacity="0.12" />
-          <path d="M4,15 Q6,25 3,35" stroke="currentColor" strokeWidth="0.6" fill="none" opacity="0.1" />
-          <path d="M12,17 Q11,27 13,37" stroke="currentColor" strokeWidth="0.6" fill="none" opacity="0.08" />
-          <path d="M20,15 Q18,25 21,35" stroke="currentColor" strokeWidth="0.6" fill="none" opacity="0.1" />
-        </svg>
+        <DotLottieReact
+          src="https://lottie.host/b2cea293-fa59-464d-9ab0-29e9908c71a6/V4hZsuXmAT.lottie"
+          loop
+          autoplay
+          style={{ width: 60, height: 60 }}
+        />
       </motion.div>
 
-      {/* Jellyfish 3 — smaller midground */}
+      {/* Lottie Jellyfish 3 — smaller midground hero */}
       <motion.div
-        className="creature creature-jelly-3"
+        className="creature lottie-creature lottie-jelly-3"
         animate={{ y: [0, '-25vh'], x: [0, 15, -10, 8] }}
         transition={{ duration: 50, repeat: Infinity, ease: 'linear', delay: 30 }}
       >
-        <svg viewBox="0 0 20 35" width="20" height="35">
-          <ellipse cx="10" cy="8" rx="8" ry="6" fill="currentColor" opacity="0.1" />
-          <path d="M4,12 Q5,20 3,28" stroke="currentColor" strokeWidth="0.5" fill="none" opacity="0.08" />
-          <path d="M10,13 Q9,22 11,30" stroke="currentColor" strokeWidth="0.5" fill="none" opacity="0.06" />
-          <path d="M16,12 Q15,20 17,28" stroke="currentColor" strokeWidth="0.5" fill="none" opacity="0.08" />
-        </svg>
+        <DotLottieReact
+          src="https://lottie.host/c32601c1-5ed7-4211-ad52-4fcc6084261c/offy4sIZvp.lottie"
+          loop
+          autoplay
+          style={{ width: 45, height: 45 }}
+        />
       </motion.div>
 
       {/* Sea turtle */}
