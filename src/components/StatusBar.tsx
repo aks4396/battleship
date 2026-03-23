@@ -41,7 +41,7 @@ export function StatusBar({
     let msg: string;
     if (allShipsPlaced) {
       msg = 'All ships placed! Press Start Game to begin.';
-    } else if (selectedShipIndex !== null && selectedShipIndex >= 0 && selectedShipIndex < FLEET.length) {
+    } else if (selectedShipIndex != null && selectedShipIndex >= 0 && selectedShipIndex < FLEET.length) {
       msg = `Place your ${FLEET[selectedShipIndex].name} (${FLEET[selectedShipIndex].size} cells). Click a cell on your board.`;
     } else {
       msg = 'Select a ship from the list to place it, or click Randomize.';
