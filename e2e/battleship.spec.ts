@@ -33,6 +33,7 @@ test.describe('Battleship E2E', () => {
 
   // Start and play a game
   test('user can start and play a game', async ({ page }) => {
+    await btn(page, 'Randomize My Board').click();
     await btn(page, 'Start Game').click();
 
     // Setup buttons should be hidden
@@ -52,6 +53,7 @@ test.describe('Battleship E2E', () => {
 
   // Repeated click on same target is blocked
   test('repeated click on same target is blocked', async ({ page }) => {
+    await btn(page, 'Randomize My Board').click();
     await btn(page, 'Start Game').click();
 
     // Click a specific cell by coordinates (row 0, col 0)
@@ -72,6 +74,7 @@ test.describe('Battleship E2E', () => {
 
   // AI takes exactly one turn after a valid player move
   test('AI takes exactly one turn after valid player move', async ({ page }) => {
+    await btn(page, 'Randomize My Board').click();
     await btn(page, 'Start Game').click();
 
     // Count player board attacks before
@@ -89,6 +92,7 @@ test.describe('Battleship E2E', () => {
 
   // Restart mid-game works
   test('restart mid-game works', async ({ page }) => {
+    await btn(page, 'Randomize My Board').click();
     await btn(page, 'Start Game').click();
 
     // Make a move
@@ -109,6 +113,7 @@ test.describe('Battleship E2E', () => {
 
   // Refresh still loads app
   test('refresh still loads app', async ({ page }) => {
+    await btn(page, 'Randomize My Board').click();
     await btn(page, 'Start Game').click();
     await expect(page.getByText(/click on the enemy board to fire/i)).toBeVisible();
 
@@ -133,6 +138,7 @@ test.describe('Battleship E2E', () => {
     expect(pointerEvents).toBe('none');
 
     // Start game and verify cells are clickable
+    await btn(page, 'Randomize My Board').click();
     await btn(page, 'Start Game').click();
     const clickableCell = page.locator('.board-container:nth-child(2) td.cell-clickable').first();
     await clickableCell.click();
@@ -149,21 +155,30 @@ test.describe('Battleship E2E', () => {
   });
 
   // Randomize button works
-  test('randomize button changes ship positions', async ({ page }) => {
-    // Get initial player board ship cells
-    const getShipCells = async () => {
-      return page.locator('.board-container:first-child td.cell-ship').evaluateAll(
-        (cells) => cells.map((c) => c.getAttribute('aria-label')),
-      );
-    };
-
-    const before = await getShipCells();
-    expect(before.length).toBe(17); // 5+4+3+3+2 = 17 ship cells
+  test('randomize button populates all ships', async ({ page }) => {
+    // Board starts empty
+    const beforeCount = await page.locator('.board-container:first-child td.cell-ship').count();
+    expect(beforeCount).toBe(0);
 
     await btn(page, 'Randomize My Board').click();
-    const after = await getShipCells();
 
-    // Ship positions should have changed (extremely unlikely to be same)
-    expect(after.length).toBe(17);
+    const afterCount = await page.locator('.board-container:first-child td.cell-ship').count();
+    expect(afterCount).toBe(17); // 5+4+3+3+2 = 17 ship cells
+  });
+
+  // Placement controls visible during setup
+  test('placement controls visible during setup', async ({ page }) => {
+    await expect(page.getByText('Place Your Ships')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Rotate/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reset Placement' })).toBeVisible();
+  });
+
+  // Start Game disabled until ships placed
+  test('Start Game disabled until ships placed', async ({ page }) => {
+    const startBtn = btn(page, 'Start Game');
+    await expect(startBtn).toBeDisabled();
+
+    await btn(page, 'Randomize My Board').click();
+    await expect(startBtn).not.toBeDisabled();
   });
 });

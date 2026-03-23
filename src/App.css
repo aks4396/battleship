@@ -110,12 +110,32 @@
               0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.boards-area {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
 .boards {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 24px;
-  margin-bottom: 20px;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .fleet-panels {

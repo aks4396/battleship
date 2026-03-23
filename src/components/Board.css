@@ -215,6 +215,23 @@
 }
 
 /* ───────────────────────────────────────────
+   Placement preview highlighting
+   ─────────────────────────────────────────── */
+.cell-preview-valid {
+  background: rgba(60, 200, 120, 0.35) !important;
+  border-color: rgba(60, 200, 120, 0.5) !important;
+  box-shadow: inset 0 0 8px rgba(60, 200, 120, 0.25),
+              0 0 4px rgba(60, 200, 120, 0.15) !important;
+}
+
+.cell-preview-invalid {
+  background: rgba(220, 60, 60, 0.35) !important;
+  border-color: rgba(220, 60, 60, 0.5) !important;
+  box-shadow: inset 0 0 8px rgba(220, 60, 60, 0.25),
+              0 0 4px rgba(220, 60, 60, 0.15) !important;
+}
+
+/* ───────────────────────────────────────────
    Ship segment styling — bow / mid / stern
    Creates connected ship shapes using border-radius
    ─────────────────────────────────────────── */

@@ -39,7 +39,20 @@ describe('App integration', () => {
   describe('setup phase', () => {
     it('renders the game title', () => {
       render(<App />);
-      expect(screen.getByText('Battleship')).toBeInTheDocument();
+      const title = document.querySelector('.title');
+      expect(title).toBeInTheDocument();
+      expect(title!.textContent).toBe('Battleship');
+    });
+
+    it('shows placement controls during setup', () => {
+      render(<App />);
+      expect(screen.getByText('Place Your Ships')).toBeInTheDocument();
+    });
+
+    it('Start Game is disabled when no ships are placed', () => {
+      render(<App />);
+      const startBtn = btn('Start Game');
+      expect(startBtn).toBeDisabled();
     });
 
     it('shows setup buttons initially', () => {
@@ -51,7 +64,7 @@ describe('App integration', () => {
 
     it('shows setup status text', () => {
       render(<App />);
-      expect(screen.getByText(/Place your fleet/i)).toBeInTheDocument();
+      expect(screen.getByText(/Place your Carrier/i)).toBeInTheDocument();
     });
 
     it('renders two boards with correct labels', () => {
@@ -109,6 +122,7 @@ describe('App integration', () => {
 
     it('start game hides setup buttons', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       expect(screen.queryByRole('button', { name: 'Randomize My Board' })).not.toBeInTheDocument();
@@ -118,6 +132,7 @@ describe('App integration', () => {
 
     it('start game shows playing status text', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       expect(
@@ -127,6 +142,7 @@ describe('App integration', () => {
 
     it('enemy board cells become clickable after starting', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       const cells = getBoardCells('Enemy Waters');
@@ -143,6 +159,7 @@ describe('App integration', () => {
   describe('gameplay', () => {
     it('clicking enemy cell during gameplay updates status text', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       const cells = getBoardCells('Enemy Waters');
@@ -156,6 +173,7 @@ describe('App integration', () => {
 
     it('clicking enemy cell changes its state', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       const cells = getBoardCells('Enemy Waters');
@@ -168,6 +186,7 @@ describe('App integration', () => {
 
     it('AI takes a turn after player attacks', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       const playerCellsBefore = getBoardCells('Your Fleet').filter(
@@ -186,6 +205,7 @@ describe('App integration', () => {
 
     it('repeated click on same cell does not trigger extra AI turn', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       const enemyCells = getBoardCells('Enemy Waters');
@@ -218,6 +238,7 @@ describe('App integration', () => {
 
     it('restart during gameplay returns to setup phase', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
       expect(screen.queryByRole('button', { name: 'Randomize My Board' })).not.toBeInTheDocument();
 
@@ -228,6 +249,7 @@ describe('App integration', () => {
 
     it('restart clears all attack markers', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       const enemyCells = getBoardCells('Enemy Waters');
@@ -245,6 +267,7 @@ describe('App integration', () => {
 
     it('restart resets all fleet status to alive', async () => {
       render(<App />);
+      await user.click(btn('Randomize My Board'));
       await user.click(btn('Start Game'));
 
       const enemyCells = getBoardCells('Enemy Waters');
@@ -281,6 +304,152 @@ describe('App integration', () => {
         (c) => c.className.includes('cell-hit') || c.className.includes('cell-miss'),
       );
       expect(attacked.length).toBe(0);
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  // Manual ship placement
+  // ─────────────────────────────────────────────
+  describe('manual ship placement', () => {
+    it('player board starts empty (no ships)', () => {
+      render(<App />);
+      const cells = getBoardCells('Your Fleet');
+      const shipCells = cells.filter((c) => c.className.includes('cell-ship'));
+      expect(shipCells.length).toBe(0);
+    });
+
+    it('clicking player board cell during setup places a ship segment', async () => {
+      render(<App />);
+      // Carrier (size 5) is auto-selected. Click cell at (0,0) = Row 1, Col A
+      const cells = getBoardCells('Your Fleet');
+      // Cell at row 0, col 0 is the first cell (index 0 in the cells array)
+      await user.click(cells[0]);
+
+      const shipCells = getBoardCells('Your Fleet').filter((c) =>
+        c.className.includes('cell-ship'),
+      );
+      // Should have placed 5 cells (Carrier)
+      expect(shipCells.length).toBe(5);
+    });
+
+    it('Randomize My Board populates all ships and enables Start Game', async () => {
+      render(<App />);
+      await user.click(btn('Randomize My Board'));
+
+      const cells = getBoardCells('Your Fleet');
+      const shipCells = cells.filter((c) => c.className.includes('cell-ship'));
+      expect(shipCells.length).toBe(17); // 5+4+3+3+2
+
+      const startBtn = btn('Start Game');
+      expect(startBtn).not.toBeDisabled();
+    });
+
+    it('Reset Placement clears the board', async () => {
+      render(<App />);
+      // Place at least one ship first
+      const cells = getBoardCells('Your Fleet');
+      await user.click(cells[0]); // Place Carrier
+
+      // Now reset
+      await user.click(btn('Reset Placement'));
+
+      const shipCells = getBoardCells('Your Fleet').filter((c) =>
+        c.className.includes('cell-ship'),
+      );
+      expect(shipCells.length).toBe(0);
+
+      const startBtn = btn('Start Game');
+      expect(startBtn).toBeDisabled();
+    });
+
+    it('Rotate button toggles orientation display', async () => {
+      render(<App />);
+      const rotateBtn = screen.getByRole('button', { name: /Rotate/i });
+      expect(rotateBtn.textContent).toContain('H'); // starts horizontal
+
+      await user.click(rotateBtn);
+      expect(rotateBtn.textContent).toContain('V'); // now vertical
+
+      await user.click(rotateBtn);
+      expect(rotateBtn.textContent).toContain('H'); // back to horizontal
+    });
+
+    it('placement controls disappear after starting game', async () => {
+      render(<App />);
+      expect(screen.getByText('Place Your Ships')).toBeInTheDocument();
+
+      await user.click(btn('Randomize My Board'));
+      await user.click(btn('Start Game'));
+
+      expect(screen.queryByText('Place Your Ships')).not.toBeInTheDocument();
+    });
+
+    it('status text updates to show next ship after placing one', async () => {
+      render(<App />);
+      expect(screen.getByText(/Place your Carrier/i)).toBeInTheDocument();
+
+      // Place Carrier at (0,0)
+      const cells = getBoardCells('Your Fleet');
+      await user.click(cells[0]);
+
+      // Should now prompt for Battleship
+      expect(screen.getByText(/Place your Battleship/i)).toBeInTheDocument();
+    });
+
+    it('shows "All ships placed" message when setup is complete', async () => {
+      render(<App />);
+      await user.click(btn('Randomize My Board'));
+
+      const statusBar = document.querySelector('.status-bar')!;
+      expect(statusBar.textContent).toMatch(/All ships placed/i);
+    });
+
+    it('restart after gameplay returns to empty board setup', async () => {
+      render(<App />);
+      await user.click(btn('Randomize My Board'));
+      await user.click(btn('Start Game'));
+
+      await user.click(btn('Restart Game'));
+
+      // Board should be empty again
+      const cells = getBoardCells('Your Fleet');
+      const shipCells = cells.filter((c) => c.className.includes('cell-ship'));
+      expect(shipCells.length).toBe(0);
+
+      // Start Game should be disabled
+      const startBtn = btn('Start Game');
+      expect(startBtn).toBeDisabled();
+
+      // Placement controls should be visible
+      expect(screen.getByText('Place Your Ships')).toBeInTheDocument();
+    });
+
+    it('manual placement then start game works for gameplay', async () => {
+      render(<App />);
+      const cells = getBoardCells('Your Fleet');
+
+      // Place all 5 ships manually (horizontal, non-overlapping rows)
+      // Carrier (5) at row 0
+      await user.click(cells[0]); // row 0, col 0
+      // Battleship (4) at row 1
+      await user.click(cells[10]); // row 1, col 0
+      // Cruiser (3) at row 2
+      await user.click(cells[20]); // row 2, col 0
+      // Submarine (3) at row 3
+      await user.click(cells[30]); // row 3, col 0
+      // Destroyer (2) at row 4
+      await user.click(cells[40]); // row 4, col 0
+
+      // All ships placed — Start Game should be enabled
+      const startBtn = btn('Start Game');
+      expect(startBtn).not.toBeDisabled();
+
+      await user.click(startBtn);
+
+      // Should be in playing phase
+      expect(
+        screen.getByText(/click on the enemy board to fire/i),
+      ).toBeInTheDocument();
     });
   });
 
