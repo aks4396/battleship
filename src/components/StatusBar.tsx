@@ -1,10 +1,15 @@
 import type { AttackResult, GamePhase, Winner } from '../game/types';
+import { FLEET } from '../game/types';
 
 interface StatusBarProps {
   phase: GamePhase;
   winner: Winner;
   lastPlayerResult: AttackResult | null;
   lastAIResult: AttackResult | null;
+  /** Whether all ships have been placed during setup */
+  allShipsPlaced?: boolean;
+  /** Index of the currently selected ship for placement, or null */
+  selectedShipIndex?: number | null;
 }
 
 function describeResult(result: AttackResult | null, actor: string): string {
@@ -29,11 +34,21 @@ export function StatusBar({
   winner,
   lastPlayerResult,
   lastAIResult,
+  allShipsPlaced,
+  selectedShipIndex,
 }: StatusBarProps) {
   if (phase === 'setup') {
+    let msg: string;
+    if (allShipsPlaced) {
+      msg = 'All ships placed! Press Start Game to begin.';
+    } else if (selectedShipIndex !== null && selectedShipIndex >= 0 && selectedShipIndex < FLEET.length) {
+      msg = `Place your ${FLEET[selectedShipIndex].name} (${FLEET[selectedShipIndex].size} cells). Click a cell on your board.`;
+    } else {
+      msg = 'Select a ship from the list to place it, or click Randomize.';
+    }
     return (
       <div className="status-bar">
-        <p>Place your fleet, then press <strong>Start Game</strong>.</p>
+        <p>{msg}</p>
       </div>
     );
   }

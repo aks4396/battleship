@@ -1,7 +1,13 @@
-import type { Board as BoardType, CellState, Ship } from '../game/types';
+import type { Board as BoardType, CellState, Coord, Ship } from '../game/types';
 import { BOARD_SIZE } from '../game/types';
 import { coordKey } from '../game/board';
 import './Board.css';
+
+/** Placement preview data passed from App during setup */
+interface PlacementPreview {
+  coords: Coord[];
+  valid: boolean;
+}
 
 interface BoardProps {
   board: BoardType;
@@ -12,6 +18,10 @@ interface BoardProps {
   onCellClick?: (row: number, col: number) => void;
   /** Whether clicks are enabled. */
   interactive?: boolean;
+  /** Called when a cell is hovered during placement. */
+  onCellHover?: (coord: Coord | null) => void;
+  /** Preview cells to highlight during ship placement. */
+  placementPreview?: PlacementPreview | null;
 }
 
 /** Ship segment info for a single cell */
@@ -64,13 +74,26 @@ export function BoardView({
   hideShips = false,
   onCellClick,
   interactive = false,
+  onCellHover,
+  placementPreview,
 }: BoardProps) {
   const segmentMap = buildShipSegmentMap(board.ships);
+
+  // Build a set of preview cell keys for fast lookup
+  const previewKeys = new Set<string>();
+  if (placementPreview) {
+    for (const c of placementPreview.coords) {
+      previewKeys.add(coordKey(c));
+    }
+  }
 
   return (
     <div className="board-container">
       <h2 className="board-label">{label}</h2>
-      <table className="board-table">
+      <table
+        className="board-table"
+        onMouseLeave={() => onCellHover?.(null)}
+      >
         <thead>
           <tr>
             <th className="corner-cell"></th>
@@ -114,6 +137,15 @@ export function BoardView({
                   }
                 }
 
+                // Placement preview highlighting
+                const isPreview = previewKeys.has(key);
+                let previewClass = '';
+                if (isPreview && placementPreview) {
+                  previewClass = placementPreview.valid
+                    ? 'cell-preview-valid'
+                    : 'cell-preview-invalid';
+                }
+
                 // Cell inner content based on state
                 let innerContent: React.ReactNode = null;
                 if (state === 'hit') {
@@ -127,12 +159,13 @@ export function BoardView({
                 return (
                   <td
                     key={col}
-                    className={`cell ${display.className} ${clickable ? 'cell-clickable' : ''} ${shipClasses.join(' ')}`}
+                    className={`cell ${display.className} ${clickable ? 'cell-clickable' : ''} ${shipClasses.join(' ')} ${previewClass}`}
                     onClick={() => {
                       if (clickable && onCellClick) {
                         onCellClick(row, col);
                       }
                     }}
+                    onMouseEnter={() => onCellHover?.({ row, col })}
                     aria-label={`Row ${row + 1}, Column ${COL_LABELS[col]}, ${state}`}
                   >
                     {innerContent}
