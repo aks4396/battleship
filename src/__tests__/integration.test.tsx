@@ -17,7 +17,7 @@ afterEach(() => {
 function getBoardCells(boardLabel: string) {
   const headings = screen.getAllByText(boardLabel);
   const heading = headings[0];
-  const container = heading.closest('.board-container')!;
+  const container = heading.closest('.board-container')! as HTMLElement;
   return within(container).getAllByRole('cell');
 }
 
