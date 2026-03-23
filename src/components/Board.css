@@ -127,6 +127,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 2;
 }
 
 /* Hit: fire/explosion effect — underwater impact */
@@ -339,7 +340,7 @@
   right: 5px;
   animation: wreck-bubble 4s ease-in infinite;
   animation-delay: var(--bubble-delay, 0s);
-  z-index: 2;
+  z-index: 3;
 }
 
 /* Stagger bubble timing per cell */
