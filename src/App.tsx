@@ -17,6 +17,7 @@ import {
 import { BoardView } from './components/Board';
 import { StatusBar } from './components/StatusBar';
 import { FleetStatus } from './components/FleetStatus';
+import { UnderwaterAmbience } from './components/UnderwaterAmbience';
 import './App.css';
 
 function deepCloneBoard(board: Board): Board {
@@ -114,6 +115,8 @@ export default function App() {
   );
 
   return (
+    <>
+    <UnderwaterAmbience />
     <div className="app">
       <h1 className="title">Battleship</h1>
 
@@ -161,5 +164,6 @@ export default function App() {
         <FleetStatus ships={aiBoard.ships} label="Enemy Ships" />
       </div>
     </div>
+    </>
   );
 }

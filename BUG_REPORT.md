@@ -1,67 +1,114 @@
 # Bug Report
 
+## Bug Reporting Methodology
+
+All bugs should be documented using the following structure:
+
+| Field | Description |
+|---|---|
+| **Bug Title** | Short, descriptive title |
+| **Severity** | Critical / High / Medium / Low |
+| **Area** | Game logic, AI, UI, Visual, Layout, State management |
+| **Environment** | Browser, OS, Node version, viewport size |
+| **Reproduction Steps** | Numbered steps to reproduce |
+| **Expected Result** | What should happen |
+| **Actual Result** | What actually happens |
+| **Root Cause** | Technical explanation of why the bug occurs |
+| **Fix Implemented** | Description of the code changes made |
+| **Regression Coverage Added** | Tests added to prevent recurrence |
+| **Validation Steps** | How to verify the fix works |
+
 ---
 
 ## Bug #1: AI forgets hits on adjacent ships when sinking a neighboring ship
 
-**Status:** Fixed
+| Field | Detail |
+|---|---|
+| **Severity** | High |
+| **Area** | AI strategy / state management |
+| **Environment** | All browsers, all viewports |
+| **Status** | Fixed |
 
-### Description
+### Reproduction Steps
 
-The AI's `updateAIState` function used a flood-fill algorithm to determine which `activeHits` belonged to a sunk ship. When a ship was sunk, it would start from the sunk coordinate and traverse through any connected `activeHits` entries (via orthogonal neighbors) to find all hits belonging to that ship. However, since ships can be placed side-by-side on the board (placement only checks for overlap, not adjacency), the flood fill could cross from the sunk ship's cells into a neighboring ship's hit cells and incorrectly remove them.
+1. Start a game where Ship A (Destroyer, size 2) is at (5,5)-(5,6) and Ship B (Cruiser, size 3) is at (5,7)-(5,9) -- immediately adjacent
+2. AI hits (5,5) -- enters target mode, adds (5,5) to activeHits
+3. AI hits (5,7) -- adds (5,7) to activeHits (now tracking hits on both ships)
+4. AI hits (5,6) -- sinks the Destroyer
 
-### Impact
+### Expected Result
 
-When two ships were placed adjacent to each other and the AI had active hits on both, sinking one ship could cause the AI to "forget" about hits on the other ship. The AI would drop back to hunt mode and lose its targeting progress on the second ship, making it play sub-optimally — essentially wasting prior intelligence.
+AI removes only the Destroyer's hits [(5,5), (5,6)] from activeHits, keeps (5,7) as an active hit, and continues targeting Ship B.
 
-**Example scenario:**
-- Ship A (Destroyer) at (5,5), (5,6)
-- Ship B (Cruiser) at (5,7), (5,8), (5,9)
-- AI hits (5,5) → `activeHits: ["5,5"]`
-- AI hits (5,7) → `activeHits: ["5,5", "5,7"]`
-- AI hits (5,6) → sinks Destroyer. Flood fill from (5,6) finds neighbor (5,5) in activeHits (correct), then finds (5,7) in activeHits (incorrect — belongs to Ship B).
-- Result: `activeHits = []`, AI switches to hunt mode, forgetting the hit on Ship B entirely.
+### Actual Result
 
-### Fix
+AI's flood-fill algorithm traverses from (5,6) to neighbor (5,5) (correct), then to (5,7) (incorrect -- belongs to Ship B). All hits are removed, AI switches to hunt mode, forgetting about Ship B entirely.
+
+### Root Cause
+
+The `updateAIState` function used a flood-fill algorithm starting from the sunk coordinate to find all connected `activeHits` entries belonging to the sunk ship. Since ships can be placed side-by-side (placement only checks for overlap, not adjacency), the flood fill could cross ship boundaries and incorrectly remove hits from neighboring ships.
+
+### Fix Implemented
 
 Added a `shipCoords` field to the `AttackResult` type, populated by `processAttack` when a ship is sunk. The `updateAIState` function now uses these exact coordinates to remove only the sunk ship's entries from `activeHits`, instead of relying on flood-fill traversal.
 
 **Files changed:**
-- `src/game/types.ts` — added optional `shipCoords?: Coord[]` to `AttackResult`
-- `src/game/attack.ts` — populate `shipCoords` in the sunk result
-- `src/game/ai.ts` — replaced flood-fill with exact coord matching
-- `src/__tests__/ai.test.ts` — added test for adjacent ships scenario
+- `src/game/types.ts` -- added optional `shipCoords?: Coord[]` to `AttackResult`
+- `src/game/attack.ts` -- populate `shipCoords` in the sunk result
+- `src/game/ai.ts` -- replaced flood-fill with exact coord matching
+
+### Regression Coverage Added
+
+- `ai.test.ts`: "does not remove adjacent ship hits when sinking a neighboring ship" -- verifies that sinking Ship A preserves Ship B's hit in activeHits
+- `attack.test.ts`: "sinking one ship does not affect adjacent ship cells" -- verifies grid state independence
+- `attack.test.ts`: "can sink adjacent ships independently" -- verifies both ships can be sunk correctly
+
+### Validation Steps
+
+1. Run `npm test` -- all AI and attack tests pass
+2. Play a game where two ships are adjacent -- verify AI continues targeting the second ship after sinking the first
 
 ---
 
-<!-- Template for additional bugs found during QA -->
+## Bug Template
 
-## Bug #N (Template)
+Use this template for any new bugs found during QA:
 
-### Description
+### Bug #N: [Title]
 
-<!-- A clear and concise description of the bug. -->
+| Field | Detail |
+|---|---|
+| **Severity** | Critical / High / Medium / Low |
+| **Area** | [area] |
+| **Environment** | [browser, OS, viewport] |
+| **Status** | Open / Fixed / Won't Fix |
 
-### Steps to Reproduce
+#### Reproduction Steps
 
-1.
-2.
-3.
+1. [step]
+2. [step]
+3. [step]
 
-### Expected Behavior
+#### Expected Result
 
-<!-- What you expected to happen. -->
+[what should happen]
 
-### Actual Behavior
+#### Actual Result
 
-<!-- What actually happened. Include screenshots if applicable. -->
+[what actually happens]
 
-### Environment
+#### Root Cause
 
-- Browser:
-- OS:
-- Node version:
+[technical explanation]
 
-### Additional Context
+#### Fix Implemented
 
-<!-- Any other context about the problem. -->
+[code changes made]
+
+#### Regression Coverage Added
+
+[tests added]
+
+#### Validation Steps
+
+[how to verify the fix]

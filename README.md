@@ -12,6 +12,7 @@ A simple online Battleship game playable against an AI, built with React + Vite 
 - AI uses hunt-and-target strategy (hunts randomly, then targets adjacent cells after a hit)
 - Clear feedback for hits, misses, sunk ships, and game outcome
 - Game locks after win/loss (no more moves allowed)
+- Immersive underwater-themed visuals with ship shapes, wreck effects, and ambient animations
 
 ## Project Structure
 
