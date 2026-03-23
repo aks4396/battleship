@@ -1,6 +1,7 @@
 import type { Board as BoardType, CellState, Ship } from '../game/types';
 import { BOARD_SIZE } from '../game/types';
 import { coordKey } from '../game/board';
+import { ShipOverlay } from './ShipOverlay';
 import './Board.css';
 
 interface BoardProps {
@@ -135,8 +136,15 @@ export function BoardView({
                     }}
                     aria-label={`Row ${row + 1}, Column ${COL_LABELS[col]}, ${state}`}
                   >
-                    {innerContent}
-                  </td>
+                      {showShipShape && segment && (
+                        <ShipOverlay
+                          position={segment.position}
+                          orientation={segment.orientation}
+                          isSunk={state === 'sunk'}
+                        />
+                      )}
+                      {innerContent}
+                    </td>
                 );
               })}
             </tr>
