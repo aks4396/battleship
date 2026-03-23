@@ -293,6 +293,29 @@
 }
 
 /* ───────────────────────────────────────────
+   SVG Ship overlay — decorative wreck rendering
+   ─────────────────────────────────────────── */
+.ship-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ship-overlay-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ship-overlay-sunk .ship-overlay-svg {
+  filter: saturate(0.6) brightness(0.7);
+}
+
+/* ───────────────────────────────────────────
    Sunk ship wreck treatment — underwater wreckage
    ─────────────────────────────────────────── */
 .seg-wreck {
@@ -316,7 +339,7 @@
   right: 5px;
   animation: wreck-bubble 4s ease-in infinite;
   animation-delay: var(--bubble-delay, 0s);
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Stagger bubble timing per cell */

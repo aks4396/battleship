@@ -183,131 +183,95 @@
 }
 
 /* ───────────────────────────────────────────
-   Fish silhouettes — individual
+   Motion-animated creatures — positioning & color
+   Motion handles all x/y animation; CSS only sets
+   position, color, and z-depth.
    ─────────────────────────────────────────── */
-.fish {
+.creature {
   position: absolute;
-  color: rgba(60, 120, 160, 0.25);
-  animation: fish-swim linear infinite;
+  pointer-events: none;
 }
 
-.fish-1 {
+/* Individual fish */
+.creature-fish-1 {
   top: 22%;
-  animation-duration: 28s;
-  animation-delay: 0s;
-  color: rgba(70, 130, 170, 0.2);
+  color: rgba(70, 135, 175, 0.22);
 }
-.fish-2 {
+.creature-fish-2 {
   top: 48%;
-  animation-duration: 35s;
-  animation-delay: 10s;
-  color: rgba(50, 110, 150, 0.18);
+  color: rgba(55, 115, 155, 0.2);
 }
-.fish-3 {
+.creature-fish-3 {
   top: 68%;
-  animation-duration: 24s;
-  animation-delay: 18s;
-  color: rgba(65, 125, 165, 0.22);
+  color: rgba(65, 125, 165, 0.24);
 }
 
-@keyframes fish-swim {
-  0% { transform: translateX(-70px) translateY(0); opacity: 0; }
-  5% { opacity: 1; }
-  25% { transform: translateX(25vw) translateY(-12px); }
-  50% { transform: translateX(50vw) translateY(8px); }
-  75% { transform: translateX(75vw) translateY(-15px); }
-  95% { opacity: 1; }
-  100% { transform: translateX(calc(100vw + 70px)) translateY(5px); opacity: 0; }
+/* Larger fish */
+.creature-big-fish {
+  top: 38%;
+  color: rgba(45, 100, 140, 0.2);
 }
 
-/* ───────────────────────────────────────────
-   School of fish
-   ─────────────────────────────────────────── */
-.fish-school {
-  position: absolute;
-  color: rgba(70, 130, 170, 0.18);
-  animation: school-swim linear infinite;
+/* Fish schools */
+.creature-school {
+  top: 30%;
+  color: rgba(70, 135, 175, 0.2);
+  height: 30px;
+  width: 100px;
+}
+.creature-school-2 {
+  top: 55%;
+  color: rgba(55, 120, 160, 0.16);
+  height: 25px;
+  width: 70px;
 }
 
-.school-1 {
-  top: 35%;
-  animation-duration: 40s;
-  animation-delay: 5s;
+/* Shark */
+.creature-shark {
+  top: 25%;
+  color: rgba(40, 65, 80, 0.15);
 }
 
-.school-fish {
-  position: absolute;
+/* Manta ray */
+.creature-ray {
+  top: 45%;
+  color: rgba(50, 90, 120, 0.14);
 }
 
-.sf-1 { top: 0; left: 0; }
-.sf-2 { top: 10px; left: 18px; }
-.sf-3 { top: -5px; left: 24px; }
-.sf-4 { top: 15px; left: 40px; }
-.sf-5 { top: 3px; left: 45px; }
-.sf-6 { top: -8px; left: 50px; }
-.sf-7 { top: 8px; left: 60px; }
-
-@keyframes school-swim {
-  0% { transform: translateX(-100px) translateY(0); opacity: 0; }
-  5% { opacity: 1; }
-  30% { transform: translateX(30vw) translateY(-15px); }
-  50% { transform: translateX(50vw) translateY(10px); }
-  70% { transform: translateX(70vw) translateY(-8px); }
-  95% { opacity: 1; }
-  100% { transform: translateX(calc(100vw + 100px)) translateY(5px); opacity: 0; }
-}
-
-/* ───────────────────────────────────────────
-   Jellyfish
-   ─────────────────────────────────────────── */
-.jellyfish {
-  position: absolute;
-  color: rgba(140, 180, 220, 0.3);
-  animation: jelly-drift linear infinite;
-}
-
-.jf-1 {
+/* Jellyfish */
+.creature-jelly-1 {
   left: 15%;
-  top: 20%;
-  animation-duration: 35s;
-  animation-delay: 0s;
+  top: 65%;
+  color: rgba(140, 180, 220, 0.3);
 }
-
-.jf-2 {
+.creature-jelly-2 {
   left: 70%;
-  top: 40%;
-  animation-duration: 42s;
-  animation-delay: 12s;
+  top: 55%;
+  color: rgba(130, 170, 210, 0.25);
+}
+.creature-jelly-3 {
+  left: 42%;
+  top: 72%;
+  color: rgba(120, 160, 200, 0.2);
 }
 
-@keyframes jelly-drift {
-  0% { transform: translateY(0) translateX(0); opacity: 0; }
-  10% { opacity: 1; }
-  25% { transform: translateY(-8vh) translateX(20px); }
-  50% { transform: translateY(-16vh) translateX(-15px); }
-  75% { transform: translateY(-24vh) translateX(10px); }
-  90% { opacity: 1; }
-  100% { transform: translateY(-35vh) translateX(-5px); opacity: 0; }
+/* Sea turtle */
+.creature-turtle {
+  top: 58%;
+  color: rgba(60, 130, 100, 0.22);
 }
 
-/* ───────────────────────────────────────────
-   Sea turtle
-   ─────────────────────────────────────────── */
-.sea-turtle {
-  position: absolute;
-  top: 60%;
-  color: rgba(60, 130, 100, 0.2);
-  animation: turtle-glide 50s linear infinite;
-  animation-delay: 20s;
+/* Seahorse */
+.creature-seahorse {
+  right: 8%;
+  top: 62%;
+  color: rgba(80, 140, 110, 0.18);
 }
 
-@keyframes turtle-glide {
-  0% { transform: translateX(-80px) translateY(0); opacity: 0; }
-  5% { opacity: 1; }
-  30% { transform: translateX(25vw) translateY(-20px); }
-  60% { transform: translateX(55vw) translateY(15px); }
-  95% { opacity: 1; }
-  100% { transform: translateX(calc(100vw + 80px)) translateY(-10px); opacity: 0; }
+/* Eel */
+.creature-eel {
+  top: 78%;
+  color: rgba(50, 90, 70, 0.15);
 }
 
 /* ───────────────────────────────────────────
@@ -343,6 +307,7 @@
 }
 .coral-1 { left: 5%; }
 .coral-2 { right: 15%; }
+.coral-3 { left: 50%; }
 
 /* Seaweed */
 .seaweed {
@@ -353,6 +318,7 @@
 .seaweed-1 { left: 20%; animation-delay: 0s; }
 .seaweed-2 { left: 60%; animation-delay: 2s; }
 .seaweed-3 { right: 10%; animation-delay: 4s; }
+.seaweed-4 { left: 40%; animation-delay: 1s; }
 
 @keyframes seaweed-sway {
   0% { transform: rotate(-3deg); }
@@ -362,6 +328,7 @@
 /* Rocks */
 .rocks { position: absolute; bottom: 0; }
 .rocks-1 { left: 30%; }
+.rocks-2 { right: 25%; }
 
 /* Treasure */
 .treasure {
@@ -389,4 +356,7 @@
   position: absolute;
   bottom: 0;
   left: 70%;
+}
+.ruins-2 {
+  left: 12%;
 }
